@@ -66,6 +66,22 @@ Model B exceeds the required minimum improvement of 0.01. Therefore, Model B is 
 
 Although Model B has a higher prediction time, it achieves a better F1-score, which is the primary selection criterion.
 
+## 7. Evaluation Visualizations
+
+The project generates three visualizations to support model comparison:
+
+1. **Model A Confusion Matrix:** Shows correct and incorrect predictions made by DistilBERT.
+2. **Model B Confusion Matrix:** Shows correct and incorrect predictions made by BERT.
+3. **Model Comparison Chart:** Compares Accuracy, Precision, Recall, and F1-score between both models.
+
+All visualization files are saved in the `outputs/` directory and logged as MLflow artifacts.
+
+### Generated Files
+
+- `outputs/model_a__champion_confusion_matrix.png`
+- `outputs/model_b__challenger_confusion_matrix.png`
+- `outputs/model_comparison.png`
+
 ## 7. MLflow Tracking and Model Registry
 
 MLflow is used to:

@@ -7,8 +7,13 @@ from sklearn.metrics import (
     accuracy_score,
     precision_score,
     recall_score,
-    f1_score
+    f1_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay
 )
+
+import matplotlib.pyplot as plt
+import os
 
 from config import (
     MODEL_A_NAME,
@@ -19,6 +24,28 @@ from config import (
 
 from hf_wrapper import SentimentModel
 
+def save_confusion_matrix(actual_labels, predicted_labels, model_name):
+
+    cm = confusion_matrix(actual_labels, predicted_labels)
+
+    display = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=["NEGATIVE", "POSITIVE"]
+    )
+
+    display.plot(cmap="Blues", values_format="d")
+
+    plt.title(f"Confusion Matrix - {model_name}")
+
+    os.makedirs("outputs", exist_ok=True)
+
+    file_path = f"outputs/{model_name}_confusion_matrix.png"
+
+    plt.savefig(file_path, dpi=300, bbox_inches="tight")
+
+    plt.close()
+
+    print(f"Confusion matrix saved: {file_path}")
 
 def evaluate_model(model_name, run_name, sentences, actual_labels):
 
@@ -40,6 +67,15 @@ def evaluate_model(model_name, run_name, sentences, actual_labels):
         1 if item["sentiment"] == "POSITIVE" else 0
         for item in predictions
     ]
+
+    save_confusion_matrix(
+    actual_labels,
+    predicted_labels,
+    run_name.replace(" ", "_").replace("-", "").lower()
+)
+    mlflow.log_artifact(
+    f"outputs/{run_name.replace(' ', '_').replace('-', '').lower()}_confusion_matrix.png"
+)
 
     # Calculate performance metrics
     accuracy = accuracy_score(actual_labels, predicted_labels)
@@ -64,6 +100,47 @@ def evaluate_model(model_name, run_name, sentences, actual_labels):
 
     return results
 
+def save_comparison_chart(results_a, results_b):
+
+    metrics = ["accuracy", "precision", "recall", "f1_score"]
+
+    model_a_values = [results_a[m] for m in metrics]
+    model_b_values = [results_b[m] for m in metrics]
+
+    x = range(len(metrics))
+    width = 0.35
+
+    plt.figure(figsize=(9, 5))
+
+    plt.bar(
+        [i - width / 2 for i in x],
+        model_a_values,
+        width,
+        label="Model A - DistilBERT"
+    )
+
+    plt.bar(
+        [i + width / 2 for i in x],
+        model_b_values,
+        width,
+        label="Model B - BERT"
+    )
+
+    plt.xticks(list(x), metrics)
+    plt.ylabel("Score")
+    plt.ylim(0, 1.1)
+    plt.title("Champion vs Challenger - Performance Comparison")
+    plt.legend()
+    plt.grid(axis="y", alpha=0.3)
+
+    os.makedirs("outputs", exist_ok=True)
+
+    file_path = "outputs/model_comparison.png"
+
+    plt.savefig(file_path, dpi=300, bbox_inches="tight")
+    plt.close()
+
+    print(f"Comparison chart saved: {file_path}")
 
 def main():
 
@@ -99,7 +176,9 @@ def main():
         )
         mlflow.log_metrics(results_b)
 
-    
+        # Generate the model comparison chart
+    save_comparison_chart(results_a, results_b)
+
     # Compare both models and record the decision
     f1_improvement = results_b["f1_score"] - results_a["f1_score"]
 
@@ -119,6 +198,9 @@ def main():
         mlflow.log_param("decision_reason", reason)
 
         mlflow.log_metric("f1_improvement", f1_improvement)
+
+                # Log comparison chart in MLflow
+        mlflow.log_artifact("outputs/model_comparison.png")
 
         for metric, value in results_a.items():
             mlflow.log_metric(f"model_a_{metric}", value)
