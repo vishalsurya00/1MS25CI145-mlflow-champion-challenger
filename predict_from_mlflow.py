@@ -19,8 +19,10 @@ model_version = client.get_model_version_by_alias(
 )
 
 print("Registered model version:", model_version.version)
-print("Hugging Face model ID:", "textattack/bert-base-uncased-SST-2")
-
+print(
+    "Hugging Face model ID:",
+    model_version.tags.get("hf_model_id")
+)
 print("Champion model loaded successfully!")
 
 # New, unseen sentences
