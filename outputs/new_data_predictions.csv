@@ -1,0 +1,11 @@
+sentence,sentiment,confidence
+This movie was absolutely fantastic!,POSITIVE,0.9996914863586426
+I hated every minute of this film.,NEGATIVE,0.998672366142273
+The acting was brilliant and the story was beautiful.,POSITIVE,0.9996240139007568
+The movie was boring and disappointing.,NEGATIVE,0.9992823004722595
+I would definitely recommend this movie.,POSITIVE,0.9984663724899292
+The worst movie I have ever watched.,NEGATIVE,0.9992082715034485
+The performances were excellent.,POSITIVE,0.9993539452552795
+I regret spending my time watching this.,NEGATIVE,0.9980104565620422
+A wonderful and entertaining experience.,POSITIVE,0.9997039437294006
+Nothing about this movie impressed me.,NEGATIVE,0.9984671473503113
